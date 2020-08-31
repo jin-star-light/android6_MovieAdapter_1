@@ -9,6 +9,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 
 /*
 내가 지금부터 여기 MovieAdapter 파일에 만들것들 .
@@ -18,13 +19,16 @@ import androidx.recyclerview.widget.RecyclerView
 data class Movie(
     //영화 정보를 담고 있는 데이터클레스에 들아갈 항목들
     //이것이 바로 1. Movie Data Class 이다.
+    //JSON의 변수명과 Movie의 변수명이 일치해야한다.
    val title : String, //1. 영화제목
    val popularity : Double, //2. 인기도
-   val description : String, //3. 설명
-   val opendate : String, //4. 개봉일
-   val posterurl : Int // 5. 포스터 url
+   val overview : String, //3. 설명
+   val release_date : String, //4. 개봉일
+   val poster_path : String // 5. 포스터 url
+)
 
-
+data class MovieList(
+    val MovieList: ArrayList<Movie>
 )
 
 //RecyclerView Adapter
@@ -54,16 +58,22 @@ class MovieAdapter(val context: Context, val movieList: ArrayList<Movie>) : Recy
         val tvPopularity = itemView.findViewById<TextView>(R.id.tvPopularity)
         val tvDescription = itemView.findViewById<TextView>(R.id.tvDescription)
         val tvOpenDate = itemView.findViewById<TextView>(R.id.tvOpenDate)
-        val container = itemView.findViewById<ConstraintLayout>(R.id.container)// 
+        val container = itemView.findViewById<ConstraintLayout>(R.id.container)//
         //Holder의 역할 : ArrayList의 데이터를 셀의 레이아웃에 알맞게 넣어주는 역할.
 
 
         fun bind(movie: Movie){
-            imgPoster.setImageResource(movie.posterurl)
+            val overview: String
+            if(movie.overview.length>21){
+                overview = movie.overview.slice(IntRange(0,20)) + "..."
+            } else {
+                overview = movie.overview
+            }
+            Glide.with(context).load("https://image.tmdb.org/t/p/w500"+movie.poster_path).into(imgPoster)
             tvTitle.text = movie.title
             tvPopularity.text = "인기도 : " + movie.popularity
-            tvDescription.text = "설명 : " + movie.description
-            tvOpenDate.text = "개봉일 : " + movie.opendate
+            tvDescription.text = "설명 : " + movie.overview
+            tvOpenDate.text = "개봉일 : " + movie.release_date
 
             container.setOnClickListener {//셀을 클릭했을 때
                 Toast.makeText(context,movie.title, Toast.LENGTH_LONG).show() //영화 제목을 토스트 메시지로 띄운다.
